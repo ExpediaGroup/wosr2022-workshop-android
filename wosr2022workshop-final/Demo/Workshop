@@ -1,0 +1,104 @@
+
+1. Create the section without any encapsulation
+
+        Column(modifier = modifier) {
+            Text(
+                "Recently Viewed",
+                color = TextStyle.SubText.color(),
+                fontSize = TextStyle.SubText.fontSize,
+                fontWeight = TextStyle.SubText.fontWeight
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                items(viewModel.recentlyViewed.value){ property ->
+                    if (viewModel.isLoading.value)
+                        PropertyViewHolder()
+                    else {
+                        //TODO:  Property View
+                    }
+                }
+            }
+        }
+
+2. Create the property view
+
+        Column(horizontalAlignment = Alignment.Start) {
+            RoundedImage(imageId = getDrawableId(property.image, LocalContext.current))
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = property.name,
+                color = property.nameFontStyle.color(),
+                fontSize = property.nameFontStyle.fontSize,
+                fontWeight = property.nameFontStyle.fontWeight
+            )
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = property.rating,
+                color = property.ratingFontStyle.color(),
+                fontSize = property.ratingFontStyle.fontSize,
+                fontWeight = property.ratingFontStyle.fontWeight
+            )
+        }
+
+
+3. Encapsulate the property into a composable view
+
+        @Composable
+        fun PropertyView(property: Property) {
+            val context = LocalContext.current
+            Column(horizontalAlignment = Alignment.Start) {
+                RoundedImage(imageId = getDrawableId(property.image, context))
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = property.name,
+                    color = property.nameFontStyle.color(),
+                    fontSize = property.nameFontStyle.fontSize,
+                    fontWeight = property.nameFontStyle.fontWeight
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = property.rating,
+                    color = property.ratingFontStyle.color(),
+                    fontSize = property.ratingFontStyle.fontSize,
+                    fontWeight = property.ratingFontStyle.fontWeight
+                )
+            }
+        }
+
+4. Encapsulate the section view
+
+        @Composable
+        fun SectionView(
+            modifier: Modifier = Modifier,
+            sectionName: String, places: List<Property>,
+            isLoading: Boolean
+        ) {
+            Box(
+                modifier = modifier
+                    .padding(0.dp)
+                    .height(height = 200.dp),
+                contentAlignment = Alignment.TopStart
+            ) {
+                Column(modifier = modifier) {
+                    Text(
+                        sectionName,
+                        color = TextStyle.SubText.color(),
+                        fontSize = TextStyle.SubText.fontSize,
+                        fontWeight = TextStyle.SubText.fontWeight
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                        items(places.size) { place ->
+                            if (isLoading)
+                                PropertyViewHolder()
+                            else
+                                PropertyView(places[place])
+                        }
+                    }
+                }
+            }
+        }
+
+5. Add the section view
+
+        SectionView(sectionName = "Recommended stays", places = viewModel.recommendedStays.value, isLoading = viewModel.isLoading.value)
